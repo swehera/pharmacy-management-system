@@ -11,6 +11,8 @@ const CheckLayout = ({ children }) => {
   useEffect(() => {
     if (!userInfo || Object.keys(userInfo).length === 0) {
       router.push("/login");
+    } else {
+      router.push("/");
     }
   }, [userInfo, router]);
 

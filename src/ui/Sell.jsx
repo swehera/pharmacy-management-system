@@ -44,7 +44,7 @@ const Sell = () => {
   console.log("medicine", medicine);
 
   const userBasedFilter =
-    user && medicine.filter((item) => item?.user === user);
+    user && medicine ? medicine.filter((item) => item?.user === user) : [];
 
   //this useEffect for searching
   useEffect(() => {
