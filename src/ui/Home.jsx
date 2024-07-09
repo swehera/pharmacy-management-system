@@ -2,8 +2,56 @@
 
 import Image from "next/image";
 import { productOne } from "../../public/images";
+import { useState, useEffect } from "react";
+import { API_BASE_URL } from "@/utils/apiConfig";
+import { getData } from "@/lib";
+import { useSelector } from "react-redux";
 
 const Home = () => {
+  const userInfo = useSelector((state) => state.user.userInfo);
+  const [totalProduct, setTotalProduct] = useState(0); // Initialize totalProduct as 0
+  const [addedProduct, setAddedProduct] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const user = userInfo?.user;
+
+  //this useEffect for fetch data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await getData(`${API_BASE_URL}/api/product`);
+        setAddedProduct(data.data);
+        console.log("data", data);
+      } catch (error) {
+        console.error("Error fetching data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [addedProduct]);
+
+  const filteredData =
+    user && addedProduct.filter((product) => product.user === user);
+
+  // Calculate total product quantity for filtered data
+  useEffect(() => {
+    if (filteredData) {
+      const total = filteredData.reduce(
+        (acc, product) => acc + product.productQuantity,
+        0
+      );
+      setTotalProduct(total);
+    }
+  }, [filteredData]);
+
+  console.log("addedProduct", addedProduct);
+  console.log("filterdata", filteredData);
+  // console.log("filterdata length", filteredData.length);
+
+  const totalProductsItems = filteredData ? filteredData.length : 0;
+
   return (
     <div className="flex flex-col gap-y-4">
       {/* box section for update details */}
@@ -14,11 +62,11 @@ const Home = () => {
         </div>
         <div className="bg-[#004A03] px-5 py-6 border-[0.5px] border-white rounded-md">
           <p className="text-sm text-white">Product on the inventory</p>
-          <p className="text-xl text-white">200 PCS</p>
+          <p className="text-xl text-white">{totalProduct} PCS</p>
         </div>
         <div className="bg-[#8C1900] px-5 py-6 border-[0.5px] border-white rounded-md">
-          <p className="text-sm text-white">Expire Product</p>
-          <p className="text-xl text-white">4 PCS</p>
+          <p className="text-sm text-white">Product Items</p>
+          <p className="text-xl text-white">{totalProductsItems} Items</p>
         </div>
       </div>
 

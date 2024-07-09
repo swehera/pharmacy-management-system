@@ -5,14 +5,19 @@ import { getData } from "@/lib";
 import toast, { Toaster } from "react-hot-toast";
 import Image from "next/image";
 import { productOne } from "../../public/images";
+import { API_BASE_URL } from "@/utils/apiConfig";
+import { useSelector } from "react-redux";
 
 const Sell = () => {
+  const userInfo = useSelector((state) => state.user.userInfo);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [medicine, setMedicine] = useState([]);
   const [filterMedicine, setFilterMedicine] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState([]);
   const [productQuantity, setProductQuantity] = useState("");
+
+  const user = userInfo?.user;
 
   // customer information
   const [customerName, setCustomerName] = useState("");
@@ -24,8 +29,9 @@ const Sell = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getData(endpoint);
-        setMedicine(data);
+        const data = await getData(`${API_BASE_URL}/api/product`);
+        setMedicine(data.data);
+        console.log("data", data);
       } catch (error) {
         console.error("Error fetching data", error);
       } finally {
@@ -33,11 +39,17 @@ const Sell = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [medicine]);
 
+  console.log("medicine", medicine);
+
+  const userBasedFilter =
+    user && medicine.filter((item) => item?.user === user);
+
+  //this useEffect for searching
   useEffect(() => {
-    const filtered = medicine.filter((item) =>
-      item?.title.toLowerCase().includes(searchText.toLowerCase())
+    const filtered = userBasedFilter.filter((item) =>
+      item?.productName.toLowerCase().includes(searchText.toLowerCase())
     );
     setFilterMedicine(filtered);
   }, [searchText, medicine]);
@@ -70,6 +82,8 @@ const Sell = () => {
     setPhone("");
     toast.success("Sell info added successfully");
   };
+
+  console.log("userBasedProducts", userBasedFilter);
 
   return (
     <div className="flex flex-col gap-y-3">
@@ -141,8 +155,8 @@ const Sell = () => {
                             />
                           </div>
                         </td>
-                        <td className="p-[8px] text-left border border-gray-800">
-                          {item?.title}
+                        <td className="p-[8px]  text-black text-left border border-gray-800">
+                          {item?.productName}
                         </td>
                         <td className="p-[8px] text-left border border-gray-800">
                           {item?.quantity}
@@ -207,7 +221,7 @@ const Sell = () => {
                               height={50}
                             />
                           </div>
-                          <p>{item.title}</p>
+                          <p>{item.productName}</p>
                         </div>
                       </div>
                     </div>

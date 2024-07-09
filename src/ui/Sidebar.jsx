@@ -1,8 +1,10 @@
 "use client";
 
+import { removeUser } from "@/redux/userSlice";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -12,6 +14,8 @@ const Sidebar = () => {
   const [product, setProduct] = useState(false);
   const [reports, setReports] = useState(false);
   const [account, setAccount] = useState(false);
+
+  const dispatch = useDispatch();
 
   const DashboardActice = () => {
     setDashboard(true);
@@ -47,6 +51,12 @@ const Sidebar = () => {
     setProduct(false);
     setReports(false);
     setAccount(true);
+  };
+
+  const handleLogout = () => {
+    // localStorage.removeItem("token");
+    dispatch(removeUser());
+    router.push("/login");
   };
 
   console.log("pathname", pathname);
@@ -128,7 +138,10 @@ const Sidebar = () => {
 
       {/* logout button here */}
       <div className=" relative top-48 ">
-        <button className=" bg-[#FF3030] py-1 w-full text-white font-bold text-sm">
+        <button
+          onClick={handleLogout}
+          className=" bg-[#FF3030] py-1 w-full text-white font-bold text-sm"
+        >
           Logout
         </button>
       </div>
