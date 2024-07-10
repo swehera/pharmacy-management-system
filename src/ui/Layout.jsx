@@ -9,6 +9,7 @@ import { Provider } from "react-redux";
 import { persistor, store } from "@/redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import CheckLayout from "./checkLayout";
+import MobileHeader from "./MobileHeader";
 
 const Layout = ({ children }) => {
   const pathname = usePathname();
@@ -38,6 +39,7 @@ const Layout = ({ children }) => {
                 } `}
               >
                 {showSideBar && <Header />}
+                {showSideBar && <MobileHeader />}
 
                 {children}
               </div>

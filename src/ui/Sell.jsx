@@ -351,7 +351,7 @@ const Sell = () => {
         )}
         <button
           onClick={handleSellSubmit}
-          className="px-4 py-2 bg-blue-600 text-white mt-4"
+          className="px-4 py-2 bg-blue-600 text-white rounded-md mt-4"
           disabled={loading}
         >
           {loading ? "Submitting..." : "Submit"}
@@ -361,7 +361,7 @@ const Sell = () => {
       <div className="bg-white/45 rounded-md p-4">
         <p className="text-2xl text-white my-2">View Sell Data</p>
         {userBasedSelledFilter.length ? (
-          <div className="overflow-y-scroll h-60">
+          <div className="overflow-y-scroll scrollbar-hide h-60">
             <table className="w-full">
               <thead>
                 <tr>
@@ -382,8 +382,13 @@ const Sell = () => {
                       {calculateTotalQuantity(sell.products)}
                     </td>
                     <td className="p-2 border border-gray-400">
-                      <Link href={`/view-details/${sell._id}`}>
-                        <p className="text-blue-500">View Details</p>
+                      <Link
+                        href={`/view-details/${sell._id}`}
+                        className=" flex items-center justify-center"
+                      >
+                        <button className="px-3 py-1 bg-slate-800 text-white text-sm rounded-md">
+                          View
+                        </button>
                       </Link>
                     </td>
                   </tr>

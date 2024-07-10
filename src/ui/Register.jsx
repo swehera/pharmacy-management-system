@@ -1,9 +1,11 @@
 "use client";
 
 import { API_BASE_URL } from "@/utils/apiConfig";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { loginPageImage, siteLogo } from "../../public/images";
 
 const Register = () => {
   const [loading, setLoading] = useState(false);
@@ -46,9 +48,7 @@ const Register = () => {
       <div className="bg-white/45 w-full p-5 flex items-center justify-center">
         <div className="w-full md:w-[80%]">
           <div>
-            <p className="text-2xl font-medium text-[#1D3471]">
-              HeraTech Software
-            </p>
+            <Image src={siteLogo} alt="site-logo" width={300} height={300} />
           </div>
 
           <div className="flex flex-col gap-y-2">
@@ -122,8 +122,14 @@ const Register = () => {
           </div>
         </div>
       </div>
-      <div className="bg-gray-300 w-full hidden md:block">
-        <p>Image side</p>
+      <div className="bg-gray-300 w-full  hidden md:block">
+        <Image
+          src={loginPageImage}
+          alt="pharma-assistant"
+          width={2000}
+          height={3000}
+          className=" w-full h-full"
+        />
       </div>
     </div>
   );

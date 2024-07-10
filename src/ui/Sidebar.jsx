@@ -1,10 +1,12 @@
 "use client";
 
 import { removeUser } from "@/redux/userSlice";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { siteLogo } from "../../public/images";
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -67,13 +69,16 @@ const Sidebar = () => {
       {/* our logo */}
       <Link
         href={"/"}
-        className=" flex flex-col items-center justify-center text-3xl font-semibold text-[#1D3471] my-5"
+        className=" flex flex-col items-center justify-center text-3xl font-semibold text-[#1D3471] my-6"
       >
-        <div>
+        {/* <div>
           <p>Farma</p>
         </div>
         <div>
           <p>BD</p>
+        </div> */}
+        <div>
+          <Image src={siteLogo} alt="site-logo" width={150} height={150} />
         </div>
       </Link>
 
