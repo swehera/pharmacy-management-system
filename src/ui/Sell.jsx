@@ -7,6 +7,9 @@ import Image from "next/image";
 import { productOne } from "../../public/images";
 import { API_BASE_URL } from "@/utils/apiConfig";
 import { useSelector } from "react-redux";
+import ViewDetails from "./ViewDetails";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const Sell = () => {
   const userInfo = useSelector((state) => state.user.userInfo);
@@ -15,23 +18,44 @@ const Sell = () => {
   const [medicine, setMedicine] = useState([]);
   const [filterMedicine, setFilterMedicine] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState([]);
-  const [productQuantity, setProductQuantity] = useState("");
-
-  const user = userInfo?.user;
-
-  // customer information
+  const [selectProductQuantity, setSelectProductQuantity] = useState("");
+  const [selledData, setSelledData] = useState([]);
+  const [filterSelledData, setFilterSelledData] = useState([]);
   const [customerName, setCustomerName] = useState("");
   const [phone, setPhone] = useState("");
 
-  const endpoint = "https://fakestoreapi.com/products";
+  const router = useRouter();
+  const user = userInfo?.user;
 
+  //that is for fetch all sell data
+  useEffect(() => {
+    const fetchSelledData = async () => {
+      try {
+        const data = await getData(`${API_BASE_URL}/api/sell`);
+        setSelledData(data.data);
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    };
+
+    fetchSelledData();
+  }, [selledData]);
+
+  const userBasedSelledFilter =
+    user && selledData ? selledData.filter((item) => item?.user === user) : [];
+
+  console.log("userBasedSelledFilter", userBasedSelledFilter);
+
+  //that is for filter user based find sell data
+  useEffect(() => {}, []);
+
+  //that fetch is for showing the product he added in her store
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const data = await getData(`${API_BASE_URL}/api/product`);
         setMedicine(data.data);
-        console.log("data", data);
       } catch (error) {
         console.error("Error fetching data", error);
       } finally {
@@ -39,14 +63,15 @@ const Sell = () => {
       }
     };
     fetchData();
-  }, [medicine]);
+  }, []);
 
-  console.log("medicine", medicine);
+  console.log("medicine data", medicine);
 
   const userBasedFilter =
     user && medicine ? medicine.filter((item) => item?.user === user) : [];
 
-  //this useEffect for searching
+  console.log("userBasedFilter", userBasedFilter);
+
   useEffect(() => {
     const filtered = userBasedFilter.filter((item) =>
       item?.productName.toLowerCase().includes(searchText.toLowerCase())
@@ -55,13 +80,22 @@ const Sell = () => {
   }, [searchText, medicine]);
 
   const handleProductClick = (item) => {
-    if (productQuantity) {
+    const availableQuantity = item.productQuantity;
+    if (selectProductQuantity > availableQuantity) {
+      toast.error(
+        `Product is not available in store. You have ${availableQuantity} pcs`
+      );
+    } else if (selectProductQuantity) {
       setSelectedProduct((prevSelectedProduct) => [
         ...prevSelectedProduct,
-        { ...item, quantity: productQuantity },
+        {
+          ...item,
+          quantity: selectProductQuantity,
+          sellingPrice: item.sellingPrice, // Ensure sellingPrice is included
+        },
       ]);
       setSearchText("");
-      setProductQuantity("");
+      setSelectProductQuantity("");
       setFilterMedicine([]);
     } else {
       toast.error("Please enter the product quantity");
@@ -73,21 +107,108 @@ const Sell = () => {
     setSelectedProduct(updatedProducts);
   };
 
+  // const handleSellSubmit = async () => {
+  //   if (!customerName || !phone || selectedProduct.length === 0) {
+  //     toast.error("Please fill in all fields and add at least one product");
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoading(true);
+  //     const response = await fetch(`${API_BASE_URL}/api/sell`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         customerName,
+  //         phone,
+  //         user,
+  //         products: selectedProduct.map(({ _id, productName, quantity }) => ({
+  //           productId: _id,
+  //           productName,
+  //           quantity: Number(quantity),
+  //         })),
+  //       }),
+  //     });
+
+  //     const data = await response.json();
+  //     console.log("Response from backend:", data);
+
+  //     if (data.success) {
+  //       setCustomerName("");
+  //       setPhone("");
+  //       setSelectedProduct([]);
+  //       toast.success("Sell info added successfully");
+  //     } else {
+  //       toast.error("Error adding sell info");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error submitting sell info", error);
+  //     toast.error("Error submitting sell info");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSellSubmit = async () => {
-    console.log("Customer Name", customerName);
-    console.log("Phone", phone);
-    console.log("selected product", selectedProduct);
-    setSelectedProduct([]);
-    setCustomerName("");
-    setPhone("");
-    toast.success("Sell info added successfully");
+    if (!customerName || !phone || selectedProduct.length === 0) {
+      toast.error("Please fill in all fields and add at least one product");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/api/sell`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          customerName,
+          phone,
+          user,
+          products: selectedProduct.map(
+            ({ _id, productName, quantity, sellingPrice }) => ({
+              productId: _id,
+              productName,
+              quantity: Number(quantity),
+              sellingPrice: Number(sellingPrice), // Ensure sellingPrice is included
+            })
+          ),
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Response from backend:", data);
+
+      if (data.success) {
+        setCustomerName("");
+        setPhone("");
+        setSelectedProduct([]);
+        toast.success("Sell info added successfully");
+      } else {
+        toast.error(`Error adding sell info: ${data.error}`);
+      }
+    } catch (error) {
+      console.error("Error submitting sell info", error);
+      toast.error("Error submitting sell info");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  console.log("userBasedProducts", userBasedFilter);
+  const calculateTotalQuantity = (products) => {
+    return products.reduce((total, product) => total + product.quantity, 0);
+  };
 
+  console.log("this is selled data", selledData);
+  console.log(
+    "this is selled data user",
+    selledData.map((user) => user.user)
+  );
   return (
     <div className="flex flex-col gap-y-3">
-      {/* add selling data */}
       <div className="bg-white/45 rounded-md p-4">
         <p className="text-2xl text-white my-2">Add Selling data</p>
         <div className="flex flex-col gap-y-2">
@@ -116,135 +237,164 @@ const Sell = () => {
             </div>
           </div>
 
-          {/* all selected products show here */}
-          <div className="w-full flex flex-col gap-y-2">
-            {selectedProduct.length !== 0 && (
-              <div className="w-full overflow-y-scroll bg-white p-4 rounded-md">
-                <div className="flex items-center justify-center">
-                  <p className="text-xl text-[#1D3471] font-semibold mb-2">
-                    Selected Products
-                  </p>
-                </div>
-                <table className="whitespace-nowrap w-full">
-                  <thead>
-                    <tr>
-                      <th className="p-[8px] text-left border border-gray-800">
-                        Image
-                      </th>
-                      <th className="p-[8px] text-left border border-gray-800">
-                        Product Name
-                      </th>
-                      <th className="p-[8px] text-left border border-gray-800">
-                        Product Quantity
-                      </th>
-                      <th className="p-[8px] text-left border border-gray-800">
-                        Edit
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedProduct.map((item, index) => (
-                      <tr key={item?.id}>
-                        <td className="p-[8px] border border-gray-800">
-                          <div className="flex items-center justify-center">
-                            <Image
-                              width={50}
-                              height={50}
-                              src={productOne}
-                              alt="product-image"
-                            />
-                          </div>
-                        </td>
-                        <td className="p-[8px]  text-black text-left border border-gray-800">
-                          {item?.productName}
-                        </td>
-                        <td className="p-[8px] text-left border border-gray-800">
-                          {item?.quantity}
-                        </td>
-                        <td className="p-[8px] border border-gray-800">
-                          <div className="flex items-center justify-center gap-x-2">
-                            <p
-                              className="cursor-pointer text-red-500"
-                              onClick={() => handleDeleteClick(index)}
-                            >
-                              Delete
-                            </p>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          {selectedProduct.length !== 0 && (
+            <div className="w-full overflow-y-scroll bg-white p-4 rounded-md">
+              <div className="flex items-center justify-center">
+                <p className="text-xl text-[#1D3471] font-semibold mb-2">
+                  Selected Product
+                </p>
               </div>
-            )}
-          </div>
-          {/* select and add product */}
-          <div className="w-full flex flex-row gap-x-3 relative">
-            <div className="w-[70%] md:w-[80%] flex flex-col gap-y-2">
-              <label className="text-sm text-white">Search Product</label>
-              <input
-                type="text"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                placeholder="Search Product"
-                className=" px-3 py-1 border-[0.5px] border-white bg-white/45 text-gray-600 outline-none"
-              />
+              <table className="whitespace-nowrap w-full">
+                <thead>
+                  <tr>
+                    <th className="p-[8px] text-left border border-gray-800">
+                      Image
+                    </th>
+                    <th className="p-[8px] text-left border border-gray-800">
+                      Product Name
+                    </th>
+                    <th className="p-[8px] text-left border border-gray-800">
+                      Product Quantity
+                    </th>
+                    <th className="p-[8px] text-left border border-gray-800">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedProduct.map((item, index) => (
+                    <tr key={index}>
+                      <td className="p-[8px] border border-gray-800">
+                        <Image
+                          src={productOne}
+                          alt="product image"
+                          width={40}
+                          height={40}
+                        />
+                      </td>
+                      <td className="p-[8px] border border-gray-800">
+                        {item.productName}
+                      </td>
+                      <td className="p-[8px] border border-gray-800">
+                        {item.quantity}
+                      </td>
+                      <td className="p-[8px] border border-gray-800">
+                        <button
+                          className="px-3 py-1 text-sm text-white bg-red-600"
+                          onClick={() => handleDeleteClick(index)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <div className="w-[30%] md:w-[20%] flex flex-col gap-y-2">
-              <label className="text-sm text-white">Product quantity</label>
-              <input
-                type="number"
-                value={productQuantity}
-                onChange={(e) => setProductQuantity(e.target.value)}
-                placeholder="Product quantity"
-                className=" px-3 py-1 border-[0.5px] border-white bg-white/45 text-gray-600 outline-none"
-              />
-            </div>
-
-            {/* this is for showing the search data */}
-            {searchText && (
-              <div className="absolute h-20 top-full mt-2 bg-white border border-gray-300 w-full max-h-60 overflow-y-auto z-20 scrollbar-hide">
-                {filterMedicine.length > 0 ? (
-                  filterMedicine.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-2 hover:bg-gray-200 cursor-pointer"
-                      onClick={() => handleProductClick(item)}
-                    >
-                      <div className="w-full border border-gray-400 rounded-md p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Image
-                              src={productOne}
-                              alt="product-image"
-                              width={50}
-                              height={50}
-                            />
-                          </div>
-                          <p>{item.productName}</p>
-                        </div>
+          )}
+        </div>
+        <div className="w-full mt-3">
+          <label className="text-sm text-white">Search Product</label>
+          <input
+            type="text"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Enter Product Name"
+            className="w-full px-3 py-1 border-[0.5px] border-white bg-white/45 text-gray-600 outline-none"
+          />
+        </div>
+        {searchText && (
+          <div className="relative">
+            <div className="absolute w-full bg-gray-300 z-50 p-2 h-60 overflow-y-scroll scrollbar-hide">
+              {filterMedicine.length !== 0 ? (
+                filterMedicine.map((item) => (
+                  <div
+                    key={item._id}
+                    className="flex items-center justify-between border-b-[0.5px] border-b-gray-500 py-2 px-3"
+                  >
+                    <div className="flex items-center gap-x-2">
+                      <Image
+                        src={item.image?.url || productOne}
+                        alt="product image"
+                        width={40}
+                        height={40}
+                      />
+                      <div className="flex flex-col gap-y-1">
+                        <p>{item.productName}</p>
+                        <p>Available Quantity: {item.productQuantity} pcs</p>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <div className="p-2">No products found</div>
-                )}
-              </div>
-            )}
+                    <div>
+                      <input
+                        type="number"
+                        value={selectProductQuantity}
+                        onChange={(e) =>
+                          setSelectProductQuantity(e.target.value)
+                        }
+                        placeholder="Quantity"
+                        className="border px-2 py-1"
+                      />
+                      <button
+                        onClick={() => handleProductClick(item)}
+                        className="px-2 py-1 bg-blue-500 text-white ml-2"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>No products found</p>
+              )}
+            </div>
           </div>
-
-          {/* add more input field for add new product and quantity */}
-          <div>
-            <button
-              onClick={handleSellSubmit}
-              className="px-4 py-1 rounded-md bg-[#1D3471] text-sm text-white"
-            >
-              Sell Product
-            </button>
-          </div>
-        </div>
+        )}
+        <button
+          onClick={handleSellSubmit}
+          className="px-4 py-2 bg-blue-600 text-white mt-4"
+          disabled={loading}
+        >
+          {loading ? "Submitting..." : "Submit"}
+        </button>
       </div>
       <Toaster />
+      <div className="bg-white/45 rounded-md p-4">
+        <p className="text-2xl text-white my-2">View Sell Data</p>
+        {userBasedSelledFilter.length ? (
+          <div className="overflow-y-scroll h-60">
+            <table className="w-full">
+              <thead>
+                <tr>
+                  <th className="p-2 border border-gray-400">Customer</th>
+                  <th className="p-2 border border-gray-400">Phone</th>
+                  <th className="p-2 border border-gray-400">Total Quantity</th>
+                  <th className="p-2 border border-gray-400">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {userBasedSelledFilter.map((sell) => (
+                  <tr key={sell._id}>
+                    <td className="p-2 border border-gray-400">
+                      {sell.customerName}
+                    </td>
+                    <td className="p-2 border border-gray-400">{sell.phone}</td>
+                    <td className="p-2 border border-gray-400">
+                      {calculateTotalQuantity(sell.products)}
+                    </td>
+                    <td className="p-2 border border-gray-400">
+                      <Link href={`/view-details/${sell._id}`}>
+                        <p className="text-blue-500">View Details</p>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p>No sell data available</p>
+        )}
+      </div>
     </div>
   );
 };

@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { API_BASE_URL } from "@/utils/apiConfig";
 import { getData } from "@/lib";
 import Loading from "./Loading";
+import toast, { Toaster } from "react-hot-toast";
 
 const Product = () => {
   const userInfo = useSelector((state) => state.user.userInfo);
@@ -36,8 +37,8 @@ const Product = () => {
           expireDate,
           purchaseDate,
           brandName,
-          purchasePrice,
-          sellingPrice,
+          purchasePrice: Number(purchasePrice),
+          sellingPrice: Number(sellingPrice),
           user,
         }),
       });
@@ -53,6 +54,10 @@ const Product = () => {
         setBrandName("");
         setPurchasePrice("");
         setSellingPrice("");
+        toast.success(data.message);
+        //in here fetchTotalProfit()
+      } else {
+        toast.error(data.message || "An error occurred");
       }
       console.log("data", data);
     } catch (error) {
@@ -274,6 +279,7 @@ const Product = () => {
           </div>
         </div>
       )}
+      <Toaster />
     </div>
   );
 };

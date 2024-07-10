@@ -1,9 +1,9 @@
 import Product from "@/models/productModel";
-import { connect } from "@/db/db"; // Ensure you are connecting to the DB
+import { connect } from "@/db/db";
 import { NextResponse } from "next/server";
 
 export const POST = async (request) => {
-  await connect(); // Connect to the database
+  await connect();
   try {
     const reqBody = await request.json();
     const {
@@ -23,7 +23,7 @@ export const POST = async (request) => {
         {
           message: "Product already exists in store",
         },
-        { status: 409 } // Conflict status code
+        { status: 409 }
       );
     }
 
@@ -53,7 +53,7 @@ export const POST = async (request) => {
   }
 };
 
-export const GET = async (request) => {
+export const GET = async () => {
   await connect();
   try {
     const products = await Product.find();

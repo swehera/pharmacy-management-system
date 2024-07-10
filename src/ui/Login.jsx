@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "./Loading";
+import toast, { Toaster } from "react-hot-toast";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -31,9 +32,15 @@ const Login = () => {
       });
       const data = await response.json();
 
+      if (data.success) {
+        toast.success("Logged in successfully");
+        dispatch(saveUser(data?.loggedData));
+        router.push("/");
+      } else {
+        toast.error(data.message);
+      }
+
       console.log("login page data", data);
-      dispatch(saveUser(data?.loggedData));
-      router.push("/");
     } catch (error) {
       console.log("Error", error);
     } finally {
@@ -120,6 +127,7 @@ const Login = () => {
           </div>
         </div>
       )}
+      <Toaster />
     </div>
   );
 };
