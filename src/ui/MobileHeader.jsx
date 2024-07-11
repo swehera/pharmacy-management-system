@@ -142,7 +142,7 @@ const MobileHeader = () => {
             onClick={handleLogout}
             className="  py-1 w-full text-red-400 font-bold text-sm"
           >
-            Logout
+            LogOut
           </button>
         </div>
       </div>
