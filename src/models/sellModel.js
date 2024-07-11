@@ -39,6 +39,8 @@
 // export default Sell;
 
 import mongoose, { Schema, model, models } from "mongoose";
+import Product from "./productModel";
+// import Product from './Product';
 
 const sellSchema = new Schema({
   customerName: {
@@ -85,6 +87,30 @@ const sellSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+});
+
+// Pre-save middleware to update product quantities
+sellSchema.pre("save", async function (next) {
+  const sell = this;
+
+  try {
+    for (let item of sell.products) {
+      const product = await Product.findById(item.productId);
+      if (!product) {
+        throw new Error(`Product with ID ${item.productId} not found`);
+      }
+      product.productQuantity -= item.quantity;
+      if (product.productQuantity < 0) {
+        throw new Error(
+          `Not enough quantity for product ${product.productName}`
+        );
+      }
+      await product.save();
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 const Sell = models.Sell || model("Sell", sellSchema);

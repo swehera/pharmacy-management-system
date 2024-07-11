@@ -207,6 +207,8 @@ const Sell = () => {
     "this is selled data user",
     selledData.map((user) => user.user)
   );
+
+  console.log("This is selected product", selectedProduct);
   return (
     <div className="flex flex-col gap-y-3">
       <div className="bg-white/45 rounded-md p-4">
@@ -310,7 +312,7 @@ const Sell = () => {
                 filterMedicine.map((item) => (
                   <div
                     key={item._id}
-                    className="flex items-center justify-between border-b-[0.5px] border-b-gray-500 py-2 px-3"
+                    className="flex items-center justify-between  gap-x-12 border-b-[0.5px] border-b-gray-500 py-2 px-3 overflow-x-scroll"
                   >
                     <div className="flex items-center gap-x-2">
                       <Image
@@ -321,10 +323,15 @@ const Sell = () => {
                       />
                       <div className="flex flex-col gap-y-1">
                         <p>{item.productName}</p>
-                        <p>Available Quantity: {item.productQuantity} pcs</p>
+                        <p>
+                          Available Quantity:{" "}
+                          <span className=" text-red-500 font-bold">
+                            {item.productQuantity} pcs
+                          </span>
+                        </p>
                       </div>
                     </div>
-                    <div>
+                    <div className=" flex flex-col md:flex-row  items-center  gap-1">
                       <input
                         type="number"
                         value={selectProductQuantity}
