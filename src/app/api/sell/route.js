@@ -15,6 +15,16 @@ export const POST = async (request) => {
         if (!productData) {
           throw new Error(`Product with id ${item.productId} not found`);
         }
+        if (productData.productQuantity < item.quantity) {
+          throw new Error(
+            `Not enough quantity for product ${productData.productName}`
+          );
+        }
+
+        // Update product quantity
+        productData.productQuantity -= item.quantity;
+        await productData.save();
+
         return {
           ...item,
           purchasePrice: productData.purchasePrice,
