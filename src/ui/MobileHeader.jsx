@@ -126,7 +126,7 @@ const MobileHeader = () => {
             Product
           </p>
         </Link>
-        <Link
+        {/* <Link
           href={"/reports"}
           onClick={ReportsActice}
           className={` flex flex-col gap-y-1 items-center justify-center p-1 ${
@@ -145,7 +145,7 @@ const MobileHeader = () => {
           >
             Reports
           </p>
-        </Link>
+        </Link> */}
         <Link
           href={"/account"}
           onClick={AccountActice}
