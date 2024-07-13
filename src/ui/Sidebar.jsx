@@ -117,7 +117,7 @@ const Sidebar = () => {
         >
           Product
         </Link>
-        <Link
+        {/* <Link
           href={"/reports"}
           onClick={ReportsActice}
           className={` w-full py-1 text-sm text-center ${
@@ -127,7 +127,7 @@ const Sidebar = () => {
           }   `}
         >
           Reports
-        </Link>
+        </Link> */}
         <Link
           href={"/account"}
           onClick={AccountActice}
