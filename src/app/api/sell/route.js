@@ -9,6 +9,7 @@ export const POST = async (request) => {
     const reqBody = await request.json();
     const { customerName, phone, products, user } = reqBody;
 
+    // Update product quantities and calculate profit
     const updatedProducts = await Promise.all(
       products.map(async (item) => {
         const productData = await Product.findById(item.productId);
@@ -21,8 +22,7 @@ export const POST = async (request) => {
           );
         }
 
-        // Update product quantity
-        productData.productQuantity -= item.quantity;
+        // productData.productQuantity -= item.quantity;
         await productData.save();
 
         return {

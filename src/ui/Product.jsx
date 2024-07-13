@@ -55,11 +55,9 @@ const Product = () => {
         setPurchasePrice("");
         setSellingPrice("");
         toast.success(data.message);
-        //in here fetchTotalProfit()
       } else {
         toast.error(data.message || "An error occurred");
       }
-      console.log("data", data);
     } catch (error) {
       console.error("Error adding product", error);
     } finally {
@@ -67,25 +65,21 @@ const Product = () => {
     }
   };
 
-  //this useEffect for fetch data
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await getData(`${API_BASE_URL}/api/product`);
         setAddedProduct(data.data);
-        console.log("data", data);
       } catch (error) {
         console.error("Error fetching data", error);
       }
     };
     fetchData();
-  }, [addedProduct]);
+  }, []);
 
-  const filteredData =
-    user && addedProduct.filter((product) => product.user === user);
-
-  // console.log("added product", addedProduct);
-  console.log("filteredData", filteredData);
+  const filteredData = user
+    ? addedProduct.filter((product) => product.user === user)
+    : [];
 
   return (
     <div>

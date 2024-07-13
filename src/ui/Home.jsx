@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { API_BASE_URL } from "@/utils/apiConfig";
 import { getData } from "@/lib";
 import { useSelector } from "react-redux";
+import Loading from "./Loading";
 
 const Home = () => {
   const userInfo = useSelector((state) => state.user.userInfo);
@@ -80,28 +81,18 @@ const Home = () => {
     fetchProfitData();
   }, [user]);
 
-  console.log("added product of the user", addedProduct);
-  console.log("this is the user id", user);
-
-  const filterUserBasedItem =
-    user && addedProduct.filter((product) => product.user === user);
-  console.log("this is the filter user product info", filterUserBasedItem);
-
-  const expiredProducts = filterUserBasedItem
-    ? filterUserBasedItem.filter(
-        (product) => calculateDaysToExpire(product.expireDate) < 0
-      )
-    : [];
-
-  const productsToExpireSoon = filterUserBasedItem
-    ? filterUserBasedItem.filter((product) => {
-        const daysToExpire = calculateDaysToExpire(product.expireDate);
-        return daysToExpire > 0 && daysToExpire <= 10;
-      })
-    : [];
+  const filterUserBasedItem = user ? filteredData : [];
+  const expiredProducts = filterUserBasedItem.filter(
+    (product) => calculateDaysToExpire(product.expireDate) < 0
+  );
+  const productsToExpireSoon = filterUserBasedItem.filter((product) => {
+    const daysToExpire = calculateDaysToExpire(product.expireDate);
+    return daysToExpire > 0 && daysToExpire <= 10;
+  });
 
   return (
     <div className="flex flex-col gap-y-4">
+      {loading && <Loading />}
       <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-3">
         <div className="bg-white/20 px-5 py-6 border-[0.5px] border-white rounded-md">
           <p className="text-sm text-white">This month profit</p>
@@ -111,7 +102,6 @@ const Home = () => {
           <p className="text-sm text-white">Product on the inventory</p>
           <p className="text-xl text-white">{totalProduct} PCS</p>
         </div>
-
         <div className="bg-orange-800 px-5 py-6 border-[0.5px] border-white rounded-md">
           <p className="text-sm text-white">Product Items</p>
           <p className="text-xl text-white">{filteredData.length} Items</p>
@@ -121,6 +111,14 @@ const Home = () => {
           <p className="text-xl text-white">{expiredProducts.length} Items</p>
         </div>
       </div>
+
+      {user && filterUserBasedItem.length === 0 && (
+        <div className="w-full p-4 bg-white rounded-md">
+          <p className="text-center font-semibold text-xl text-[#1D3471]">
+            No Products Added in store
+          </p>
+        </div>
+      )}
 
       <div>
         <div className="my-2">
@@ -202,7 +200,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* that is for already expired product */}
       <div>
         <div className="my-2">
           <p className="text-sm text-white">Already Expired</p>

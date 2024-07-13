@@ -40,7 +40,6 @@
 
 import mongoose, { Schema, model, models } from "mongoose";
 import Product from "./productModel";
-// import Product from './Product';
 
 const sellSchema = new Schema({
   customerName: {

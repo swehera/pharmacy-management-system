@@ -20,14 +20,12 @@ const Sell = () => {
   const [selectedProduct, setSelectedProduct] = useState([]);
   const [selectProductQuantity, setSelectProductQuantity] = useState("");
   const [selledData, setSelledData] = useState([]);
-  const [filterSelledData, setFilterSelledData] = useState([]);
   const [customerName, setCustomerName] = useState("");
   const [phone, setPhone] = useState("");
 
   const router = useRouter();
   const user = userInfo?.user;
 
-  //that is for fetch all sell data
   useEffect(() => {
     const fetchSelledData = async () => {
       try {
@@ -44,12 +42,6 @@ const Sell = () => {
   const userBasedSelledFilter =
     user && selledData ? selledData.filter((item) => item?.user === user) : [];
 
-  console.log("userBasedSelledFilter", userBasedSelledFilter);
-
-  //that is for filter user based find sell data
-  useEffect(() => {}, []);
-
-  //that fetch is for showing the product he added in her store
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -65,18 +57,15 @@ const Sell = () => {
     fetchData();
   }, []);
 
-  console.log("medicine data", medicine);
-
   const userBasedFilter =
     user && medicine ? medicine.filter((item) => item?.user === user) : [];
-
-  console.log("userBasedFilter", userBasedFilter);
 
   useEffect(() => {
     const filtered = userBasedFilter.filter((item) =>
       item?.productName.toLowerCase().includes(searchText.toLowerCase())
     );
     setFilterMedicine(filtered);
+    userBasedFilter;
   }, [searchText, medicine]);
 
   const handleProductClick = (item) => {
@@ -106,50 +95,6 @@ const Sell = () => {
     const updatedProducts = selectedProduct.filter((_, i) => i !== index);
     setSelectedProduct(updatedProducts);
   };
-
-  // const handleSellSubmit = async () => {
-  //   if (!customerName || !phone || selectedProduct.length === 0) {
-  //     toast.error("Please fill in all fields and add at least one product");
-  //     return;
-  //   }
-
-  //   try {
-  //     setLoading(true);
-  //     const response = await fetch(`${API_BASE_URL}/api/sell`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         customerName,
-  //         phone,
-  //         user,
-  //         products: selectedProduct.map(({ _id, productName, quantity }) => ({
-  //           productId: _id,
-  //           productName,
-  //           quantity: Number(quantity),
-  //         })),
-  //       }),
-  //     });
-
-  //     const data = await response.json();
-  //     console.log("Response from backend:", data);
-
-  //     if (data.success) {
-  //       setCustomerName("");
-  //       setPhone("");
-  //       setSelectedProduct([]);
-  //       toast.success("Sell info added successfully");
-  //     } else {
-  //       toast.error("Error adding sell info");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error submitting sell info", error);
-  //     toast.error("Error submitting sell info");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleSellSubmit = async () => {
     if (!customerName || !phone || selectedProduct.length === 0) {
@@ -202,13 +147,6 @@ const Sell = () => {
     return products.reduce((total, product) => total + product.quantity, 0);
   };
 
-  console.log("this is selled data", selledData);
-  console.log(
-    "this is selled data user",
-    selledData.map((user) => user.user)
-  );
-
-  console.log("This is selected product", selectedProduct);
   return (
     <div className="flex flex-col gap-y-3">
       <div className="bg-white/45 rounded-md p-4">

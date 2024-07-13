@@ -66,11 +66,17 @@ const MobileHeader = () => {
   return (
     <Container className=" block md:hidden w-full bg-blue-700/45 my-3">
       <div className=" grid grid-cols-3 gap-2">
-        <div className={` flex flex-col gap-y-1 items-center justify-center`}>
+        <Link
+          href={"/"}
+          onClick={DashboardActice}
+          className={` flex flex-col gap-y-1 items-center justify-center p-1  ${
+            dashboard &&
+            pathname === "/" &&
+            " border border-gray-200 rounded-md"
+          } `}
+        >
           <BiSolidDashboard className=" text-white text-2xl" />
-          <Link
-            href={"/"}
-            onClick={DashboardActice}
+          <p
             className={` w-full py-1 text-sm text-center ${
               dashboard || pathname === "/"
                 ? "bg-[#001039] text-white"
@@ -78,13 +84,19 @@ const MobileHeader = () => {
             }   `}
           >
             Dashboard
-          </Link>
-        </div>
-        <div className={` flex flex-col gap-y-1 items-center justify-center`}>
+          </p>
+        </Link>
+        <Link
+          href={"/sell"}
+          onClick={SellActice}
+          className={` flex flex-col gap-y-1 items-center justify-center p-1  ${
+            sell &&
+            pathname === "/sell" &&
+            "  border border-gray-200 rounded-md"
+          }`}
+        >
           <TiShoppingCart className=" text-white text-2xl" />
-          <Link
-            href={"/sell"}
-            onClick={SellActice}
+          <p
             className={` w-full py-1 text-sm text-center ${
               sell && pathname === "/sell"
                 ? "bg-[#001039] text-white"
@@ -92,13 +104,19 @@ const MobileHeader = () => {
             }   `}
           >
             Sell
-          </Link>
-        </div>
-        <div className={` flex flex-col gap-y-1 items-center justify-center`}>
+          </p>
+        </Link>
+        <Link
+          href={"/product"}
+          onClick={ProductActice}
+          className={` flex flex-col gap-y-1 items-center justify-center p-1 ${
+            product &&
+            pathname === "/product" &&
+            "  border border-gray-200 rounded-md"
+          }`}
+        >
           <FaBoxOpen className=" text-white text-2xl" />
-          <Link
-            href={"/product"}
-            onClick={ProductActice}
+          <p
             className={` w-full py-1 text-sm text-center ${
               product && pathname === "/product"
                 ? "bg-[#001039] text-white"
@@ -106,13 +124,19 @@ const MobileHeader = () => {
             }   `}
           >
             Product
-          </Link>
-        </div>
-        <div className={` flex flex-col gap-y-1 items-center justify-center`}>
+          </p>
+        </Link>
+        <Link
+          href={"/reports"}
+          onClick={ReportsActice}
+          className={` flex flex-col gap-y-1 items-center justify-center p-1 ${
+            reports &&
+            pathname === "/reports" &&
+            "  border border-gray-200 rounded-md"
+          }`}
+        >
           <TbReportSearch className=" text-white text-2xl" />
-          <Link
-            href={"/reports"}
-            onClick={ReportsActice}
+          <p
             className={` w-full py-1 text-sm text-center ${
               reports && pathname === "/reports"
                 ? "bg-[#001039] text-white"
@@ -120,13 +144,19 @@ const MobileHeader = () => {
             }   `}
           >
             Reports
-          </Link>
-        </div>
-        <div className={` flex flex-col gap-y-1 items-center justify-center`}>
+          </p>
+        </Link>
+        <Link
+          href={"/account"}
+          onClick={AccountActice}
+          className={` flex flex-col gap-y-1 items-center justify-center p-1 ${
+            account &&
+            pathname === "/account" &&
+            "  border border-gray-200 rounded-md"
+          }`}
+        >
           <MdAccountBox className=" text-white text-2xl" />
-          <Link
-            href={"/account"}
-            onClick={AccountActice}
+          <p
             className={` w-full py-1 text-sm text-center ${
               account && pathname === "/account"
                 ? "bg-[#001039] text-white"
@@ -134,8 +164,8 @@ const MobileHeader = () => {
             }   `}
           >
             Account
-          </Link>
-        </div>
+          </p>
+        </Link>
         <div className={` flex flex-col gap-y-1 items-center justify-center`}>
           <IoMdLogOut className=" text-red-500 text-2xl" />
           <button

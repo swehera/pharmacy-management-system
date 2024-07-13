@@ -17,16 +17,16 @@ export const POST = async (request) => {
       user,
     } = reqBody;
 
+    // Check if the product already exists for the user
     const existingProduct = await Product.findOne({ productName, user });
     if (existingProduct) {
       return NextResponse.json(
-        {
-          message: "Product already exists in store",
-        },
+        { message: "Product already exists in store" },
         { status: 409 }
       );
     }
 
+    // Create new product
     const productData = new Product({
       productName,
       productQuantity,

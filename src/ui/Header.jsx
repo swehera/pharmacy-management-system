@@ -24,11 +24,11 @@ const Header = () => {
   return (
     <div className="w-full mt-5 mb-3 flex items-center justify-between">
       <div>
-        <p className="text-2xl text-white">Hi, {userInfo?.name}</p>
+        <p className=" text-xl md:text-2xl text-white">Hi, {userInfo?.name}</p>
         <p className="text-sm text-white">{dateTime.date}</p>
       </div>
       <div>
-        <p className="text-3xl text-white">{dateTime.time}</p>
+        <p className=" text-2xl md:text-3xl text-white">{dateTime.time}</p>
       </div>
     </div>
   );
